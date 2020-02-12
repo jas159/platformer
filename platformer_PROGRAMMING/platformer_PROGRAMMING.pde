@@ -1,23 +1,23 @@
 import fisica.*;
 
 color black = #000000;
-color green = color(0,255,0);
+color green = color(0, 255, 0);
 color blue = color(153, 217, 234);
 color yellow = color(255, 242, 0);
 color brown = color(185, 122, 87);
 color deepBlue = color(5, 109, 177);
 color pink = color(255, 174, 201);
-color red = color(236,28,36);
+color red = color(236, 28, 36);
 
 boolean akey, wkey, skey, dkey, upkey, downkey, rightkey, leftkey, spacekey;
-float vx, vy;
+float vx, vy, zoomfactor, angle;
 PImage map, brick;
-int x=0;
-int y=0;
+int x=0, y=0;
 int gridSize = 40;
 int zoom;
 float topSpeed = 500;
 FBox player1, player2;
+FBomb bomb =null;
 FWorld world;
 ArrayList<FBox> boxes = new ArrayList<FBox>();
 
@@ -29,14 +29,14 @@ void setup() {
   world.setGravity(0, 900);
 
   map = loadImage("map.png");
- brick = loadImage("brick.png");
- brick.resize(40,40);
- 
- zoom =5;
+  brick = loadImage("brick.png");
+  brick.resize(40, 40);
+
+  zoom =5;
   player1 = new FBox(40, 40);
   player1.setNoStroke();
-  player1.setPosition(1,40);
-  player1.setFill(227,234,40);
+  player1.setPosition(1, 40);
+  player1.setFill(227, 234, 40);
   //player1.attachImage(earth);
   player1.setRotatable(false);
   player1.setFriction(0.9);
@@ -88,8 +88,8 @@ void setup() {
 void draw() {
   background(255);
 
-pushMatrix(); //begin some transformations
-translate(-player1.getX()+ width/2, -player1.getY()+ height/2);
+  pushMatrix(); //begin some transformations
+  translate(-player1.getX()+ width/2, -player1.getY()+ height/2);
   world.draw();
   world.step();
 
@@ -106,7 +106,42 @@ translate(-player1.getX()+ width/2, -player1.getY()+ height/2);
   ArrayList<FContact> contacts = player1.getContacts();
   if (upkey && contacts.size() > 0) player1.setVelocity(player1.getVelocityX(), -500);
 
+if (spacekey && bomb ==null) {
+ bomb = new FBomb(); 
+}
   //pushMatrix();
+}
+
+class FBomb extends FBox {
+  int timer; 
+
+  FBomb() {
+    super(gridSize, gridSize); //fbox constructor
+    this.setFillColor(red);
+    this.setPosition(player1.getX() +gridSize, player1.getY() +gridSize);
+    timer = 60;
+  }
+
+  void tick() {
+    timer--; 
+    if (timer ==0) {
+      explode();
+      world.remove(this);
+      bomb = null;
+    }
+  }
+
+  void explode() {
+    for (int i = 0; i < boxes.size(); i++) {
+      FBox b = boxes.get(i);
+      if (dist(this.getX(), this.getY(), b.getX(), b.getY()) {
+        b.setStatic(false);
+        vx = b.getX() - this.getX();
+        vy = b.getY() - this.getY();
+        b.setVelocity(vx*10, vy*10);
+      }
+    }
+  }
 }
 
 //void loadWorld() {
