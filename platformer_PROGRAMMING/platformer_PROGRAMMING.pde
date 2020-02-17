@@ -22,7 +22,7 @@ FWorld world;
 ArrayList<FBox> boxes = new ArrayList<FBox>();
 
 void setup() {
-  size(800, 600);
+  size(800, 600, FX2D);
 
   Fisica.init(this);
   world = new FWorld(-10000, -10000, 10000, 10000);
@@ -35,7 +35,7 @@ void setup() {
   zoom =5;
   player1 = new FBox(40, 40);
   player1.setNoStroke();
-  player1.setPosition(1, 40);
+  player1.setPosition(1000, 100);
   player1.setFill(227, 234, 40);
   //player1.attachImage(earth);
   player1.setRotatable(false);
@@ -64,6 +64,7 @@ void setup() {
       b.setPosition(x*gridSize, y*gridSize);
       b.setStatic(true);
       world.add(b);
+      boxes.add(b);
     }
 
     if (c == green) {
@@ -106,43 +107,15 @@ void draw() {
   ArrayList<FContact> contacts = player1.getContacts();
   if (upkey && contacts.size() > 0) player1.setVelocity(player1.getVelocityX(), -500);
 
-if (spacekey && bomb ==null) {
- bomb = new FBomb(); 
-}
+  if (spacekey && bomb ==null) {
+    bomb = new FBomb();
+  }
+  if (bomb!=null)bomb.tick();
+
   //pushMatrix();
 }
 
-class FBomb extends FBox {
-  int timer; 
 
-  FBomb() {
-    super(gridSize, gridSize); //fbox constructor
-    this.setFillColor(red);
-    this.setPosition(player1.getX() +gridSize, player1.getY() +gridSize);
-    timer = 60;
-  }
-
-  void tick() {
-    timer--; 
-    if (timer ==0) {
-      explode();
-      world.remove(this);
-      bomb = null;
-    }
-  }
-
-  void explode() {
-    for (int i = 0; i < boxes.size(); i++) {
-      FBox b = boxes.get(i);
-      if (dist(this.getX(), this.getY(), b.getX(), b.getY()) {
-        b.setStatic(false);
-        vx = b.getX() - this.getX();
-        vy = b.getY() - this.getY();
-        b.setVelocity(vx*10, vy*10);
-      }
-    }
-  }
-}
 
 //void loadWorld() {
 
